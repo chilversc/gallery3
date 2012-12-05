@@ -35,6 +35,11 @@ class search_Core {
   }
 
   static function search($q, $limit, $offset) {
+    $album = ORM::factory("item", 1);
+    return search::searchWithinAlbum($album, $q, $limit, $offset);
+  }
+
+  static function searchWithinAlbum($album, $q, $limit, $offset) {
     $db = Database::instance();
     $q = $db->escape($q);
 
@@ -52,6 +57,8 @@ class search_Core {
       "  MATCH({search_records}.`data`) AGAINST ('$q') AS `score` " .
       "FROM {items} JOIN {search_records} ON ({items}.`id` = {search_records}.`item_id`) " .
       "WHERE MATCH({search_records}.`data`) AGAINST ('$q' IN BOOLEAN MODE) " .
+      "AND {items}.left_ptr > " . $db->quote($album->left_ptr) .
+      "AND {items}.right_ptr <= " . $db->quote($album->right_ptr) .
       $access_sql .
       "ORDER BY `score` DESC " .
       "LIMIT $limit OFFSET $offset";

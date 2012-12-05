@@ -8,6 +8,7 @@
     <ul>
       <li>
         <label for="q"><?= t("Search the gallery") ?></label>
+        <input name="album" type="hidden" value="<?= html::clean_attribute($album->id) ?>" />
         <input name="q" id="q" type="text" value="<?= html::clean_attribute($q) ?>" class="text" />
       </li>
       <li>
@@ -19,6 +20,17 @@
 
 <div id="g-search-results">
   <h1><?= t("Search results") ?></h1>
+
+  <? if ($album->id == 1) { ?>
+  <div>
+    <?= t("Searched whole gallery") ?>
+  </div>
+  <? } else { ?>
+  <div>
+    <?= t("Searched within album %album", array("album" => html::purify($album->title))) ?>
+    <a href="<?= url::site(url::merge(array("album" => 1))) ?>"><?= t("Search whole gallery") ?></a>
+  </div>
+  <? } ?>
 
   <? if (count($items)): ?>
   <ul id="g-album-grid" class="ui-helper-clearfix">

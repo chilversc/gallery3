@@ -23,6 +23,12 @@ class Search_Controller extends Controller {
     $q = Input::instance()->get("q");
     $page = Input::instance()->get("page", 1);
 
+    $albumId = Input::instance()->get("album", 1);
+    $album = ORM::factory("item", $albumId);
+    if (!$album || !$album->is_album()) {
+      $album = ORM::factory("item", 1);
+    }
+
     // Make sure that the page references a valid offset
     if ($page < 1) {
       $page = 1;
@@ -31,7 +37,7 @@ class Search_Controller extends Controller {
     $offset = ($page - 1) * $page_size;
 
     $q_with_more_terms = search::add_query_terms($q);
-    list ($count, $result) = search::search($q_with_more_terms, $page_size, $offset);
+    list ($count, $result) = search::searchWithinAlbum($album, $q_with_more_terms, $page_size, $offset);
 
     $max_pages = max(ceil($count / $page_size), 1);
 
@@ -42,6 +48,7 @@ class Search_Controller extends Controller {
                                 "children_count" => $count));
 
     $template->content = new View("search.html");
+    $template->content->album = $album;
     $template->content->items = $result;
     $template->content->q = $q;
 

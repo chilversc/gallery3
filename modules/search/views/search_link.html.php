@@ -1,5 +1,12 @@
 <?php defined("SYSPATH") or die("No direct script access.") ?>
 <form action="<?= url::site("search") ?>" id="g-quick-search-form" class="g-short-form">
+  <? if ($item && $item instanceof Item_Model_Core) { ?>
+    <? if ($item->is_album ()) { ?>
+      <input type="hidden" name="album" value="<?= $item->id ?>" />
+    <? } else { ?>
+      <input type="hidden" name="album" value="<?= $item->parent_id ?>" />
+    <? } ?>
+  <? } ?>
   <ul>
     <li>
       <label for="g-search"><?= t("Search the gallery") ?></label>
